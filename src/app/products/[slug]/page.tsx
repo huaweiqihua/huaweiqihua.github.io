@@ -16,9 +16,9 @@ import { sampleProducts } from "@/lib/sample-data";
 import type { PlatformListing, Product } from "@/lib/types";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export function generateStaticParams() {
@@ -26,7 +26,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = getProductBySlug(params.slug);
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -111,8 +112,9 @@ function VideoPanel({ product }: { product: Product }) {
   );
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product || product.visibility !== "visible") {
     notFound();

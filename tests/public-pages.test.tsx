@@ -16,8 +16,8 @@ describe("public storefront pages", () => {
     expect(screen.queryByText(/sync error/i)).not.toBeInTheDocument();
   });
 
-  it("renders marketplace price links and review highlights on product detail", () => {
-    render(<ProductPage params={{ slug: "street-vinyl-pilot-figure" }} />);
+  it("renders marketplace price links and review highlights on product detail", async () => {
+    render(await ProductPage({ params: Promise.resolve({ slug: "street-vinyl-pilot-figure" }) }));
 
     expect(screen.getByRole("heading", { name: "Street Vinyl Pilot Figure" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /buy on tiktok/i })).toHaveAttribute("href", expect.stringContaining("tiktok"));
@@ -27,7 +27,7 @@ describe("public storefront pages", () => {
   });
 
   it("generates product metadata from catalog data", async () => {
-    await expect(generateMetadata({ params: { slug: "cyber-mecha-assembly-kit" } })).resolves.toMatchObject({
+    await expect(generateMetadata({ params: Promise.resolve({ slug: "cyber-mecha-assembly-kit" }) })).resolves.toMatchObject({
       title: "Cyber Mecha Assembly Kit"
     });
   });
