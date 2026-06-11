@@ -34,7 +34,7 @@ describe("public storefront pages", () => {
       );
     }
     expect(screen.getAllByText(/see local price/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/captured gbp price/i)).toBeInTheDocument();
+    expect(screen.queryByText(/captured gbp price/i)).not.toBeInTheDocument();
     expect(screen.getByLabelText(/review summary/i)).toBeInTheDocument();
   });
 

@@ -76,9 +76,6 @@ function MarketplaceCard({ listing }: { listing: PlatformListing | undefined }) 
         <div className="text-right">
           <p className="text-2xl font-black text-[#f8f4ea]">{priceDisplay.primaryText}</p>
           <p className="mt-1 text-xs font-semibold text-[#9da7b8]">{priceDisplay.secondaryText}</p>
-          {priceDisplay.capturedText ? (
-            <p className="mt-1 text-xs font-semibold text-[#9da7b8]">{priceDisplay.capturedText}</p>
-          ) : null}
         </div>
       </div>
       <a

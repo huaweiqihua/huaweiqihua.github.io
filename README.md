@@ -76,8 +76,8 @@ Copy `.env.example` to `.env.local` for local development.
 - `TEMU_STORAGE_STATE_PATH`: optional Playwright storage-state file for logged-in Temu sync.
 
 Marketplace prices are region-specific. The public storefront only treats listings in `NEXT_PUBLIC_TARGET_PRICE_CURRENCY`
-as local shopper prices. Other captured currencies are shown as captured reference prices on detail pages and are omitted
-from Product JSON-LD offer prices to avoid presenting a UK/EU capture as a US price.
+as local shopper prices. Other captured currencies are replaced with a local-price prompt on public pages and are omitted
+from Product JSON-LD offer prices so shoppers and search engines do not see a UK/EU capture as a US price.
 
 ## Supabase
 
