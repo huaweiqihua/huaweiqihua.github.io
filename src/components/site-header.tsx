@@ -7,6 +7,8 @@ const navItems = [
   { href: "/about", label: "About" }
 ];
 
+const showAdminLink = process.env.NEXT_PUBLIC_SHOW_ADMIN_LINK === "true";
+
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-[#07080d]/90 backdrop-blur-xl">
@@ -30,9 +32,11 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Link href="/admin" className="rounded-lg bg-[#ccff3f] px-3 py-2 text-sm font-black text-[#07080d]">
-            Admin
-          </Link>
+          {showAdminLink ? (
+            <Link href="/admin" className="rounded-lg bg-[#ccff3f] px-3 py-2 text-sm font-black text-[#07080d]">
+              Admin
+            </Link>
+          ) : null}
         </nav>
       </div>
     </header>
