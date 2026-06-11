@@ -27,6 +27,7 @@ export interface PlatformListing {
   availability: ListingAvailability;
   ratingAverage: number | null;
   reviewCount: number;
+  soldCount?: number;
   lastSeenAt: string;
   lastSuccessfulCrawlAt: string;
 }

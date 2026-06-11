@@ -5,6 +5,7 @@ import AdminMatchesPage from "@/app/admin/matches/page";
 import AdminProductsPage from "@/app/admin/products/page";
 import AdminReviewsPage from "@/app/admin/reviews/page";
 import AdminSyncPage from "@/app/admin/sync/page";
+import { listProducts } from "@/lib/catalog";
 
 describe("admin pages", () => {
   it("renders dashboard metrics for sync and review operations", () => {
@@ -25,11 +26,17 @@ describe("admin pages", () => {
   });
 
   it("renders match review approval controls", () => {
+    const hasMatchCandidates = listProducts().some((product) => product.match);
+
     render(<AdminMatchesPage />);
 
     expect(screen.getByRole("heading", { name: /match review/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /approve match/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: /reject/i }).length).toBeGreaterThan(0);
+    if (hasMatchCandidates) {
+      expect(screen.getAllByRole("button", { name: /approve match/i }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: /reject/i }).length).toBeGreaterThan(0);
+    } else {
+      expect(screen.getByText(/no match candidates yet/i)).toBeInTheDocument();
+    }
   });
 
   it("renders review curation controls", () => {

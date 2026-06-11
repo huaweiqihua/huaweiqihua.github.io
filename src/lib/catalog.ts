@@ -1,11 +1,16 @@
-import { sampleProducts, sampleSyncErrors, sampleSyncRuns } from "@/lib/sample-data";
+import { getCatalogProducts } from "@/lib/catalog-source";
+import { sampleSyncErrors, sampleSyncRuns } from "@/lib/sample-data";
 import type { Platform, PlatformListing, Product, ProductReview } from "@/lib/types";
 
-export function listVisibleProducts(products: Product[] = sampleProducts) {
+export function listProducts(products: Product[] = getCatalogProducts()) {
+  return products;
+}
+
+export function listVisibleProducts(products: Product[] = getCatalogProducts()) {
   return products.filter((product) => product.visibility === "visible");
 }
 
-export function getProductBySlug(slug: string, products: Product[] = sampleProducts) {
+export function getProductBySlug(slug: string, products: Product[] = getCatalogProducts()) {
   return products.find((product) => product.slug === slug);
 }
 
@@ -61,6 +66,10 @@ export function getReviewCount(product: Product) {
   return product.listings.reduce((sum, listing) => sum + listing.reviewCount, 0);
 }
 
+export function getSoldCount(product: Product) {
+  return product.listings.reduce((sum, listing) => sum + (listing.soldCount ?? 0), 0);
+}
+
 export function getReviewHighlights(product: Product, limit = 3): ProductReview[] {
   return product.reviews
     .filter((review) => !review.isHidden)
@@ -78,11 +87,11 @@ export function getReviewHighlights(product: Product, limit = 3): ProductReview[
     }));
 }
 
-export function listPendingMatches(products: Product[] = sampleProducts) {
+export function listPendingMatches(products: Product[] = getCatalogProducts()) {
   return products.filter((product) => product.match?.status === "pending");
 }
 
-export function getDashboardStats(products: Product[] = sampleProducts) {
+export function getDashboardStats(products: Product[] = getCatalogProducts()) {
   const visibleProducts = listVisibleProducts(products);
   const matchedProducts = products.filter((product) => product.matchStatus === "matched");
   const pendingMatches = listPendingMatches(products);

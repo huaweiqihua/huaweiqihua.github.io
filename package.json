@@ -11,7 +11,9 @@
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "sync": "tsx scripts/sync.ts"
+    "sync": "tsx scripts/sync.ts",
+    "sync:login": "tsx scripts/save-storage-state.ts",
+    "import:capture": "tsx scripts/import-browser-capture.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",

@@ -7,8 +7,8 @@ English storefront for model kits, figures, and designer toy drops synced from T
 - Public home page with 1:1 product cards.
 - Public product detail pages with TikTok-priority media, videos, review highlights, and TikTok/Temu purchase links.
 - Private admin screens for products, match review, review curation, and sync logs.
-- Typed sample catalog for local MVP mode.
-- Playwright-ready crawler boundary with dry-run sync.
+- Typed sample catalog for local fallback mode.
+- Playwright crawler with login-wall detection, TikTok short-link handling, DOM extraction, and generated catalog output.
 - Supabase/Postgres schema for production data.
 
 ## Local Setup
@@ -40,6 +40,24 @@ pnpm sync -- --live --platform=tiktok
 pnpm sync -- --live --platform=temu
 ```
 
+Run a live crawl for both platforms and replace the local generated catalog only if real product listings are extracted:
+
+```bash
+pnpm sync -- --live --write-catalog
+```
+
+The app reads `data/catalog/products.json` first. If that file is empty, it falls back to the local sample catalog so the UI remains browsable during development. Failed, blocked, or login-only crawls do not overwrite the generated catalog.
+
+If a platform requires login, save a Playwright browser session after manually logging in:
+
+```bash
+pnpm sync:login -- --platform=tiktok
+pnpm sync:login -- --platform=temu
+```
+
+This writes `.auth/tiktok.storage-state.json` or `.auth/temu.storage-state.json`, which live sync can reuse through `TIKTOK_STORAGE_STATE_PATH` and `TEMU_STORAGE_STATE_PATH`. The script opens a normal browser window; complete any CAPTCHA, verification, or login steps yourself.
+When Google Chrome is installed, the login helper opens Chrome through Playwright. It still uses an isolated automation profile instead of your daily Chrome profile, so it can save only the marketplace session needed by the crawler.
+
 Live crawling may fail if TikTok or Temu blocks automated browser access, asks for login, changes page markup, or serves region-specific content. A failed crawl should not delete existing product data.
 
 ## Environment Variables
@@ -52,6 +70,8 @@ Copy `.env.example` to `.env.local` for local development.
 - `SYNC_SECRET`: bearer token required by `/api/sync/run`.
 - `TIKTOK_SHOP_URL`: TikTok Shop source URL.
 - `TEMU_MALL_URL`: Temu mall source URL.
+- `TIKTOK_STORAGE_STATE_PATH`: optional Playwright storage-state file for logged-in TikTok sync.
+- `TEMU_STORAGE_STATE_PATH`: optional Playwright storage-state file for logged-in Temu sync.
 
 ## Supabase
 

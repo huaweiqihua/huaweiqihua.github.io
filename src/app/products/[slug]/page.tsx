@@ -10,9 +10,11 @@ import {
   getProductBySlug,
   getRatingAverage,
   getReviewCount,
-  getReviewHighlights
+  getReviewHighlights,
+  getSoldCount,
+  listVisibleProducts
 } from "@/lib/catalog";
-import { sampleProducts } from "@/lib/sample-data";
+import { createProductJsonLd, serializeJsonLd } from "@/lib/seo";
 import type { PlatformListing, Product } from "@/lib/types";
 
 interface ProductPageProps {
@@ -22,7 +24,7 @@ interface ProductPageProps {
 }
 
 export function generateStaticParams() {
-  return sampleProducts.filter((product) => product.visibility === "visible").map((product) => ({ slug: product.slug }));
+  return listVisibleProducts().map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
@@ -38,9 +40,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   return {
     title: product.displayName,
     description: product.sellingPoint,
+    alternates: {
+      canonical: `/products/${product.slug}`
+    },
     openGraph: {
       title: product.displayName,
       description: product.sellingPoint,
+      url: `/products/${product.slug}`,
       images: [product.primaryImageUrl]
     }
   };
@@ -124,10 +130,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const temuListing = getListing(product, "temu");
   const rating = getRatingAverage(product);
   const reviewCount = getReviewCount(product);
+  const soldCount = getSoldCount(product);
   const highlights = getReviewHighlights(product);
+  const productJsonLd = createProductJsonLd(product);
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#07080d_0%,#0e111a_52%,#07080d_100%)] text-[#f8f4ea]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(productJsonLd) }}
+      />
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-[#9da7b8] hover:text-white">
@@ -151,7 +163,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </h1>
               <p className="mt-4 text-lg leading-8 text-[#dbe3ef]">{product.sellingPoint}</p>
             </div>
-            <ReviewSummary rating={rating} reviewCount={reviewCount} reviews={highlights} />
+            <ReviewSummary rating={rating} reviewCount={reviewCount} soldCount={soldCount} reviews={highlights} />
             <section className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
               <h2 className="text-lg font-black text-[#f8f4ea]">TikTok product detail</h2>
               <p className="mt-3 text-sm leading-7 text-[#b8c2d4]">{product.description}</p>

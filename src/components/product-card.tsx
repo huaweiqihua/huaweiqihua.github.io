@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBestListing, getRatingAverage, getReviewCount } from "@/lib/catalog";
+import { getBestListing, getRatingAverage, getReviewCount, getSoldCount } from "@/lib/catalog";
 import type { Product } from "@/lib/types";
 import { ReviewSummary } from "@/components/review-summary";
 
@@ -11,6 +11,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const bestListing = getBestListing(product);
   const rating = getRatingAverage(product);
   const reviewCount = getReviewCount(product);
+  const soldCount = getSoldCount(product);
 
   return (
     <article className="group overflow-hidden rounded-lg border border-white/10 bg-[#10131d]/90 transition duration-200 hover:-translate-y-1 hover:border-[#ccff3f]/70">
@@ -33,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </Link>
       <div className="p-4">
         <div className="mb-3">
-          <ReviewSummary rating={rating} reviewCount={reviewCount} reviews={[]} compact />
+          <ReviewSummary rating={rating} reviewCount={reviewCount} soldCount={soldCount} reviews={[]} compact />
         </div>
         <h2 className="min-h-10 text-base font-black leading-5 text-[#f8f4ea]">{product.displayName}</h2>
         <p className="mt-2 min-h-12 text-sm leading-6 text-[#9da7b8]">{product.sellingPoint}</p>

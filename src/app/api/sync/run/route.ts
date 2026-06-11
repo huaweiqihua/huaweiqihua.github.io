@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runDrySync } from "@/lib/sync/crawler";
+import { runDrySync } from "@/lib/sync/dry-run";
 
 export const runtime = "nodejs";
 
