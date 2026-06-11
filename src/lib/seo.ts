@@ -1,4 +1,4 @@
-import { getBestListing, getRatingAverage, getReviewCount, getReviewHighlights } from "@/lib/catalog";
+import { getRatingAverage, getReviewCount, getReviewHighlights, isTargetMarketPrice } from "@/lib/catalog";
 import type { Product } from "@/lib/types";
 
 export function getSiteUrl() {
@@ -29,21 +29,25 @@ function productImages(product: Product) {
 export function createProductJsonLd(product: Product) {
   const rating = getRatingAverage(product);
   const reviewCount = getReviewCount(product);
-  const bestListing = getBestListing(product);
-  const offers = product.listings
-    .filter((listing) => listing.priceAmount !== null)
-    .map((listing) => ({
+  const offers = product.listings.map((listing) => {
+    const offer: Record<string, unknown> = {
       "@type": "Offer",
       url: listing.canonicalUrl,
-      price: listing.priceAmount?.toFixed(2),
-      priceCurrency: listing.priceCurrency,
       availability:
         listing.availability === "out_of_stock" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
       seller: {
         "@type": "Organization",
         name: listing.platform === "tiktok" ? "TikTok Shop" : "Temu"
       }
-    }));
+    };
+
+    if (isTargetMarketPrice(listing)) {
+      offer.price = listing.priceAmount?.toFixed(2);
+      offer.priceCurrency = listing.priceCurrency;
+    }
+
+    return offer;
+  });
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -56,8 +60,6 @@ export function createProductJsonLd(product: Product) {
     offers: offers.length > 1 ? offers : (offers[0] ?? {
       "@type": "Offer",
       url: absoluteUrl(`/products/${product.slug}`),
-      price: bestListing.priceAmount?.toFixed(2),
-      priceCurrency: bestListing.priceCurrency,
       availability: "https://schema.org/InStock"
     })
   };

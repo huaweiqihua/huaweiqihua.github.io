@@ -67,6 +67,18 @@ describe("SEO technical layer", () => {
     expect(jsonLd.aggregateRating).toBeUndefined();
   });
 
+  it("does not publish non-US captured prices as US product offer prices", () => {
+    const firstProduct = listVisibleProducts()[0];
+    const jsonLd = createProductJsonLd(firstProduct);
+
+    expect(jsonLd.offers).toMatchObject({
+      "@type": "Offer",
+      url: firstProduct.listings[0].canonicalUrl
+    });
+    expect((jsonLd.offers as Record<string, unknown>).price).toBeUndefined();
+    expect((jsonLd.offers as Record<string, unknown>).priceCurrency).toBeUndefined();
+  });
+
   it("marks the admin section as noindex", () => {
     render(<AdminLayout><div>Admin child</div></AdminLayout>);
 

@@ -5,7 +5,7 @@ import { ArrowLeft, ExternalLink, Play } from "lucide-react";
 import { ReviewSummary } from "@/components/review-summary";
 import { SiteHeader } from "@/components/site-header";
 import {
-  formatPrice,
+  getListingPriceDisplay,
   getListing,
   getProductBySlug,
   getRatingAverage,
@@ -62,6 +62,7 @@ function MarketplaceCard({ listing }: { listing: PlatformListing | undefined }) 
   }
 
   const platformName = listing.platform === "tiktok" ? "TikTok Shop" : "Temu";
+  const priceDisplay = getListingPriceDisplay(listing);
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.05] p-5">
@@ -72,7 +73,13 @@ function MarketplaceCard({ listing }: { listing: PlatformListing | undefined }) 
             Updated {new Date(listing.lastSuccessfulCrawlAt).toLocaleDateString("en-US")}
           </p>
         </div>
-        <p className="text-2xl font-black text-[#f8f4ea]">{formatPrice(listing)}</p>
+        <div className="text-right">
+          <p className="text-2xl font-black text-[#f8f4ea]">{priceDisplay.primaryText}</p>
+          <p className="mt-1 text-xs font-semibold text-[#9da7b8]">{priceDisplay.secondaryText}</p>
+          {priceDisplay.capturedText ? (
+            <p className="mt-1 text-xs font-semibold text-[#9da7b8]">{priceDisplay.capturedText}</p>
+          ) : null}
+        </div>
       </div>
       <a
         href={listing.canonicalUrl}

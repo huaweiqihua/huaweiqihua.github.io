@@ -2,6 +2,18 @@ import { getCatalogProducts } from "@/lib/catalog-source";
 import { sampleSyncErrors, sampleSyncRuns } from "@/lib/sample-data";
 import type { Platform, PlatformListing, Product, ProductReview } from "@/lib/types";
 
+interface PriceDisplayOptions {
+  targetCurrency?: string;
+  targetMarketLabel?: string;
+}
+
+export interface ListingPriceDisplay {
+  primaryText: string;
+  secondaryText: string;
+  capturedText?: string;
+  isTargetMarketPrice: boolean;
+}
+
 export function listProducts(products: Product[] = getCatalogProducts()) {
   return products;
 }
@@ -38,6 +50,18 @@ export function getListing(product: Product, platform: Platform) {
   return product.listings.find((listing) => listing.platform === platform);
 }
 
+export function getTargetPriceCurrency() {
+  return (process.env.NEXT_PUBLIC_TARGET_PRICE_CURRENCY || "USD").toUpperCase();
+}
+
+export function getTargetMarketLabel() {
+  return process.env.NEXT_PUBLIC_TARGET_MARKET_LABEL || "US";
+}
+
+function getPlatformDisplayName(platform: Platform) {
+  return platform === "tiktok" ? "TikTok" : "Temu";
+}
+
 export function formatPrice(listing: PlatformListing | undefined) {
   if (!listing || listing.priceAmount === null) {
     return "Not listed";
@@ -47,6 +71,72 @@ export function formatPrice(listing: PlatformListing | undefined) {
     style: "currency",
     currency: listing.priceCurrency
   }).format(listing.priceAmount);
+}
+
+export function isTargetMarketPrice(
+  listing: PlatformListing | undefined,
+  targetCurrency = getTargetPriceCurrency()
+) {
+  return Boolean(
+    listing &&
+      listing.priceAmount !== null &&
+      listing.priceCurrency.toUpperCase() === targetCurrency.toUpperCase()
+  );
+}
+
+export function getBestTargetMarketListing(
+  product: Product,
+  targetCurrency = getTargetPriceCurrency()
+) {
+  const targetListings = product.listings.filter((listing) => isTargetMarketPrice(listing, targetCurrency));
+
+  if (targetListings.length === 0) {
+    return undefined;
+  }
+
+  return targetListings.reduce((best, listing) => {
+    if (best.priceAmount === null || listing.priceAmount === null) {
+      return best;
+    }
+
+    return listing.priceAmount < best.priceAmount ? listing : best;
+  });
+}
+
+export function getPublicPriceListing(product: Product) {
+  return getBestTargetMarketListing(product) ?? getBestListing(product);
+}
+
+export function getListingPriceDisplay(
+  listing: PlatformListing | undefined,
+  options: PriceDisplayOptions = {}
+): ListingPriceDisplay {
+  if (!listing || listing.priceAmount === null) {
+    return {
+      primaryText: "See local price",
+      secondaryText: "Open marketplace for local price",
+      isTargetMarketPrice: false
+    };
+  }
+
+  const targetCurrency = (options.targetCurrency ?? getTargetPriceCurrency()).toUpperCase();
+  const targetMarketLabel = options.targetMarketLabel ?? getTargetMarketLabel();
+  const platformName = getPlatformDisplayName(listing.platform);
+
+  if (isTargetMarketPrice(listing, targetCurrency)) {
+    return {
+      primaryText: formatPrice(listing),
+      secondaryText: `From ${platformName}`,
+      isTargetMarketPrice: true
+    };
+  }
+
+  return {
+    primaryText: "See local price",
+    secondaryText: `Open ${platformName} for ${targetMarketLabel} price`,
+    capturedText: `Captured ${listing.priceCurrency.toUpperCase()} price: ${formatPrice(listing)}`,
+    isTargetMarketPrice: false
+  };
 }
 
 export function getRatingAverage(product: Product) {

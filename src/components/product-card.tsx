@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBestListing, getRatingAverage, getReviewCount, getSoldCount } from "@/lib/catalog";
+import { getListingPriceDisplay, getPublicPriceListing, getRatingAverage, getReviewCount, getSoldCount } from "@/lib/catalog";
 import type { Product } from "@/lib/types";
 import { ReviewSummary } from "@/components/review-summary";
 
@@ -8,7 +8,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const bestListing = getBestListing(product);
+  const bestListing = getPublicPriceListing(product);
+  const priceDisplay = getListingPriceDisplay(bestListing);
   const rating = getRatingAverage(product);
   const reviewCount = getReviewCount(product);
   const soldCount = getSoldCount(product);
@@ -40,15 +41,8 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="mt-2 min-h-12 text-sm leading-6 text-[#9da7b8]">{product.sellingPoint}</p>
         <div className="mt-4 flex items-end justify-between gap-3">
           <div>
-            <p className="text-xl font-black text-[#f8f4ea]">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: bestListing.priceCurrency
-              }).format(bestListing.priceAmount ?? 0)}
-            </p>
-            <p className="text-xs font-semibold text-[#9da7b8]">
-              From {bestListing.platform === "tiktok" ? "TikTok" : "Temu"}
-            </p>
+            <p className="text-xl font-black text-[#f8f4ea]">{priceDisplay.primaryText}</p>
+            <p className="text-xs font-semibold text-[#9da7b8]">{priceDisplay.secondaryText}</p>
           </div>
           <Link
             href={`/products/${product.slug}`}

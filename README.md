@@ -66,12 +66,18 @@ Copy `.env.example` to `.env.local` for local development.
 
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: public Supabase anon key.
+- `NEXT_PUBLIC_TARGET_MARKET_LABEL`: public shopper market label, defaults to `US`.
+- `NEXT_PUBLIC_TARGET_PRICE_CURRENCY`: public shopper price currency, defaults to `USD`.
 - `SUPABASE_SERVICE_ROLE_KEY`: service role key for crawler/admin writes.
 - `SYNC_SECRET`: bearer token required by `/api/sync/run`.
 - `TIKTOK_SHOP_URL`: TikTok Shop source URL.
 - `TEMU_MALL_URL`: Temu mall source URL.
 - `TIKTOK_STORAGE_STATE_PATH`: optional Playwright storage-state file for logged-in TikTok sync.
 - `TEMU_STORAGE_STATE_PATH`: optional Playwright storage-state file for logged-in Temu sync.
+
+Marketplace prices are region-specific. The public storefront only treats listings in `NEXT_PUBLIC_TARGET_PRICE_CURRENCY`
+as local shopper prices. Other captured currencies are shown as captured reference prices on detail pages and are omitted
+from Product JSON-LD offer prices to avoid presenting a UK/EU capture as a US price.
 
 ## Supabase
 

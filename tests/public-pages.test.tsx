@@ -14,6 +14,8 @@ describe("public storefront pages", () => {
     expect(screen.getByText(products[0].displayName)).toBeInTheDocument();
     expect(screen.getAllByText(/TikTok image|Temu image/i).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: /view/i }).length).toBeGreaterThanOrEqual(products.length);
+    expect(screen.getAllByText(/see local price/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText("£27.49")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /admin/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/match confidence/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/sync error/i)).not.toBeInTheDocument();
@@ -31,6 +33,8 @@ describe("public storefront pages", () => {
         listing.canonicalUrl
       );
     }
+    expect(screen.getAllByText(/see local price/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/captured gbp price/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/review summary/i)).toBeInTheDocument();
   });
 
