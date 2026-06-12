@@ -136,12 +136,21 @@ function isLikelyTitle(line: string) {
   return /[a-z0-9]/i.test(normalizedLine);
 }
 
+function cleanTitleCandidate(value: string) {
+  return cleanLine(value)
+    .replace(/^top pick\s*/i, "")
+    .replace(/^item picture\s*/i, "")
+    .replace(/(?:US\$|\$|USD\s*|£|GBP\s*)\d{1,5}(?:[,.]\d{1,2})?.*$/i, "")
+    .replace(/\s*open in new tab\.?$/i, "")
+    .trim();
+}
+
 function pickTitle(candidate: PageCandidate) {
   const titleCandidates = [
-    candidate.imageAlt ?? "",
     candidate.text,
+    candidate.imageAlt ?? "",
     ...(candidate.containerText ?? "").split(/\n+/)
-  ].map(cleanLine);
+  ].map(cleanTitleCandidate);
 
   return titleCandidates.find(isLikelyTitle) ?? "";
 }

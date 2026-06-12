@@ -67,14 +67,30 @@ describe("SEO technical layer", () => {
     expect(jsonLd.aggregateRating).toBeUndefined();
   });
 
-  it("does not publish non-US captured prices as US product offer prices", () => {
+  it("publishes USD captured prices as US product offer prices", () => {
     const firstProduct = listVisibleProducts()[0];
     const jsonLd = createProductJsonLd(firstProduct);
+    const firstListing = firstProduct.listings[0];
 
     expect(jsonLd.offers).toMatchObject({
       "@type": "Offer",
-      url: firstProduct.listings[0].canonicalUrl
+      url: firstListing.canonicalUrl,
+      price: firstListing.priceAmount?.toFixed(2),
+      priceCurrency: "USD"
     });
+  });
+
+  it("does not publish non-US captured prices as US product offer prices", () => {
+    const firstProduct = listVisibleProducts()[0];
+    const jsonLd = createProductJsonLd({
+      ...firstProduct,
+      listings: firstProduct.listings.map((listing) => ({
+        ...listing,
+        priceAmount: 27.49,
+        priceCurrency: "GBP"
+      }))
+    });
+
     expect((jsonLd.offers as Record<string, unknown>).price).toBeUndefined();
     expect((jsonLd.offers as Record<string, unknown>).priceCurrency).toBeUndefined();
   });

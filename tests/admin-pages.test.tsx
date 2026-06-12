@@ -5,7 +5,9 @@ import AdminMatchesPage from "@/app/admin/matches/page";
 import AdminProductsPage from "@/app/admin/products/page";
 import AdminReviewsPage from "@/app/admin/reviews/page";
 import AdminSyncPage from "@/app/admin/sync/page";
+import { ReviewCurationTable } from "@/components/review-curation-table";
 import { listProducts } from "@/lib/catalog";
+import { sampleProducts } from "@/lib/sample-data";
 
 describe("admin pages", () => {
   it("renders dashboard metrics for sync and review operations", () => {
@@ -40,11 +42,25 @@ describe("admin pages", () => {
   });
 
   it("renders review curation controls", () => {
+    render(<ReviewCurationTable products={sampleProducts.slice(0, 1)} />);
+
+    expect(screen.getAllByRole("button", { name: /feature review/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /hide review/i }).length).toBeGreaterThan(0);
+  });
+
+  it("renders an empty review curation state when no review snippets are available", () => {
+    const productsWithoutReviews = listProducts().map((product) => ({ ...product, reviews: [] }));
+
+    render(<ReviewCurationTable products={productsWithoutReviews} />);
+
+    expect(screen.getByText(/no review snippets available yet/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /feature review/i })).not.toBeInTheDocument();
+  });
+
+  it("renders the review admin page", () => {
     render(<AdminReviewsPage />);
 
     expect(screen.getByRole("heading", { name: /reviews/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /feature review/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: /hide review/i }).length).toBeGreaterThan(0);
   });
 
   it("renders sync logs and run control", () => {

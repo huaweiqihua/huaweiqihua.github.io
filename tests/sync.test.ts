@@ -82,6 +82,29 @@ describe("sync helpers", () => {
     });
   });
 
+  it("cleans Temu browser capture title chrome from product titles", () => {
+    const listings = extractListingsFromCandidates({
+      platform: "temu",
+      pageUrl: "https://www.temu.com/mall.html?mall_id=634418218007252",
+      candidates: [
+        {
+          href: "https://www.temu.com/8-27-inch-movable-mech-g-601104001684115.html",
+          text: "Top pick8.27-Inch Movable Mech Assembly Model – Alloy Skeleton, Interchangeable Hands, Includes Display BaseOpen in new tab.",
+          imageUrl: "https://img.kwcdn.com/product/mech.jpg",
+          imageAlt: "item picture 8 27 inch movable mech assembly model alloy skeleton interchangeable hands includes display base",
+          containerText:
+            "Top pick8.27-Inch Movable Mech Assembly Model – Alloy Skeleton, Interchangeable Hands, Includes Display BaseOpen in new tab.$75.59$75.5919sold19sold"
+        }
+      ]
+    });
+
+    expect(listings[0]).toMatchObject({
+      title: "8.27-Inch Movable Mech Assembly Model – Alloy Skeleton, Interchangeable Hands, Includes Display Base",
+      priceAmount: 75.59,
+      priceCurrency: "USD"
+    });
+  });
+
   it("extracts Temu UK product URLs and GBP prices from browser captures", () => {
     const listings = extractListingsFromCandidates({
       platform: "temu",
