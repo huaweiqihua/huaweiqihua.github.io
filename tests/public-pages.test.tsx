@@ -29,10 +29,13 @@ describe("public storefront pages", () => {
 
     expect(screen.getByRole("heading", { name: product.displayName })).toBeInTheDocument();
     for (const listing of product.listings) {
-      expect(screen.getByRole("link", { name: new RegExp(`buy on ${listing.platform}`, "i") })).toHaveAttribute(
-        "href",
-        listing.canonicalUrl
-      );
+      const link = screen.getByRole("link", { name: new RegExp(`buy on ${listing.platform}`, "i") });
+
+      expect(link).toHaveAttribute("href", listing.canonicalUrl);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link.getAttribute("rel")).toContain("noopener");
+      expect(link.getAttribute("rel")).toContain("noreferrer");
+      expect(link).toHaveAttribute("referrerpolicy", "no-referrer");
     }
     expect(screen.getAllByText(/\$\d/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/see local price/i)).not.toBeInTheDocument();

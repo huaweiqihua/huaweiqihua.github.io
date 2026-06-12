@@ -80,6 +80,9 @@ function MarketplaceCard({ listing }: { listing: PlatformListing | undefined }) 
       </div>
       <a
         href={listing.canonicalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        referrerPolicy="no-referrer"
         className={
           listing.platform === "tiktok"
             ? "mt-4 flex h-11 items-center justify-center gap-2 rounded-lg bg-[#ff4b87] text-sm font-black text-white"
